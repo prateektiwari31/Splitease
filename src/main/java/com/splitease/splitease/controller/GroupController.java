@@ -17,6 +17,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final ExpenseService expenseService;
+
     @PostMapping
     public ResponseEntity<GroupResponse> createGroup(
             @Valid @RequestBody CreateGroupRequest request) {
