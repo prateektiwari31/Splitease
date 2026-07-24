@@ -1,7 +1,7 @@
 package com.splitease.splitease.controller;
 
-import com.splitease.splitease.dto.CreateGroupRequest;
-import com.splitease.splitease.dto.GroupResponse;
+import com.splitease.splitease.dto.*;
+import com.splitease.splitease.service.ExpenseService;
 import com.splitease.splitease.service.GroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
-
+    private final ExpenseService expenseService;
     @PostMapping
     public ResponseEntity<GroupResponse> createGroup(
             @Valid @RequestBody CreateGroupRequest request) {
@@ -35,4 +35,30 @@ public class GroupController {
 
         return ResponseEntity.ok(groupService.getGroup(groupId));
     }
+
+    @PostMapping("/{groupId}/members")
+    public ResponseEntity<GroupResponse> addMember(
+            @PathVariable Long groupId,
+            @Valid @RequestBody AddMemberRequest request
+    ) {
+        return ResponseEntity.ok(groupService.addMember(groupId, request));
+    }
+
+    @DeleteMapping("/{groupId}/members/{userId}")
+    public ResponseEntity<GroupResponse> removeMember(
+            @PathVariable Long groupId,
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(groupService.removeMember(groupId, userId));
+    }
+    @PostMapping("/{groupId}/expenses")
+    public ResponseEntity<ExpenseResponse> addExpense(
+            @PathVariable Long groupId,
+            @Valid @RequestBody CreateExpenseRequest request
+    ){
+        return ResponseEntity.ok(
+                expenseService.addExpense(groupId,request)
+        );
+    }
+
 }

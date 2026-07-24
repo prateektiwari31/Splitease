@@ -1,5 +1,6 @@
 package com.splitease.splitease.service;
 
+import com.splitease.splitease.dto.AddMemberRequest;
 import com.splitease.splitease.dto.CreateGroupRequest;
 import com.splitease.splitease.dto.GroupResponse;
 import com.splitease.splitease.model.ExpenseGroup;
@@ -81,6 +82,72 @@ public class GroupService {
                 .memberCount(group.getMembers().size())
                 .build();
     }
+    public GroupResponse addMember(Long groupId, AddMemberRequest request) {
+
+        User currentUser = getCurrentUser();
+
+        ExpenseGroup group = expenseGroupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        if (!group.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Only group creator can add members");
+        }
+
+        User newMember = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (group.getMembers().contains(newMember)) {
+            throw new RuntimeException("User is already a member");
+        }
+
+        group.getMembers().add(newMember);
+
+        ExpenseGroup savedGroup = expenseGroupRepository.save(group);
+
+        return GroupResponse.builder()
+                .id(savedGroup.getId())
+                .name(savedGroup.getName())
+                .description(savedGroup.getDescription())
+                .createdBy(savedGroup.getCreatedBy().getName())
+                .memberCount(savedGroup.getMembers().size())
+                .build();
+    }
+
+    public GroupResponse removeMember(Long groupId, Long userId) {
+
+        User currentUser = getCurrentUser();
+
+        ExpenseGroup group = expenseGroupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        if (!group.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Only group creator can remove members");
+        }
+
+        User member = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().contains(member)) {
+            throw new RuntimeException("User is not a member of this group");
+        }
+
+        if (group.getCreatedBy().getId().equals(member.getId())) {
+            throw new RuntimeException("Group creator cannot be removed");
+        }
+
+        group.getMembers().remove(member);
+
+        ExpenseGroup savedGroup = expenseGroupRepository.save(group);
+
+        return GroupResponse.builder()
+                .id(savedGroup.getId())
+                .name(savedGroup.getName())
+                .description(savedGroup.getDescription())
+                .createdBy(savedGroup.getCreatedBy().getName())
+                .memberCount(savedGroup.getMembers().size())
+                .build();
+    }
+
     private User getCurrentUser() {
 
         Authentication authentication = SecurityContextHolder
@@ -92,4 +159,6 @@ public class GroupService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+
 }
