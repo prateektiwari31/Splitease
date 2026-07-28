@@ -3,10 +3,12 @@ package com.splitease.splitease.service;
 import com.splitease.splitease.dto.AuthResponse;
 import com.splitease.splitease.dto.LoginRequest;
 import com.splitease.splitease.dto.RegisterRequest;
+import com.splitease.splitease.exception.ApiException;
 import com.splitease.splitease.model.User;
 import com.splitease.splitease.repository.UserRepository;
 import com.splitease.splitease.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +26,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new ApiException("Email already registered", HttpStatus.CONFLICT);
         }
 
         User user = User.builder()
@@ -50,7 +52,7 @@ public class AuthService {
         );
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
         String token = jwtService.generateToken(user);
 

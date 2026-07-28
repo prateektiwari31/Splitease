@@ -2,6 +2,7 @@ package com.splitease.splitease.service;
 
 import com.splitease.splitease.dto.CreateExpenseRequest;
 import com.splitease.splitease.dto.ExpenseResponse;
+import com.splitease.splitease.dto.SplitInfo;
 import com.splitease.splitease.model.*;
 import com.splitease.splitease.repository.ExpenseGroupRepository;
 import com.splitease.splitease.repository.ExpenseRepository;
@@ -140,12 +141,59 @@ public class ExpenseService {
                     throw new RuntimeException("Split amount does not match total amount");
                 }
             }
+            case PERCENTAGE -> {
+
+                if (request.getSplits() == null || request.getSplits().isEmpty()) {
+                    throw new RuntimeException("Splits are required");
+                }
+
+                double totalPercentage = 0;
+                List<Long> addedUsers = new ArrayList<>();
+
+                for (var splitRequest : request.getSplits()) {
+
+                    User user = userRepository.findById(splitRequest.getUserId())
+                            .orElseThrow(() -> new RuntimeException("User not found"));
+
+                    if (!group.getMembers().contains(user)) {
+                        throw new RuntimeException(user.getName() + " is not a member of this group");
+                    }
+
+                    if (addedUsers.contains(user.getId())) {
+                        throw new RuntimeException("Duplicate participant found");
+                    }
+                    addedUsers.add(user.getId());
+
+                    totalPercentage += splitRequest.getPercentage();
+
+                    double amountOwed = (splitRequest.getPercentage() / 100.0) * request.getTotalAmount();
+
+                    ExpenseSplit split = ExpenseSplit.builder()
+                            .expense(savedExpense)
+                            .user(user)
+                            .amountOwed(amountOwed)
+                            .build();
+
+                    expenseSplits.add(split);
+                }
+
+                if (Math.abs(totalPercentage - 100.0) > 0.01) {
+                    throw new RuntimeException("Percentages must add up to 100");
+                }
+            }
 
             default ->
                     throw new RuntimeException(request.getSplitType() + " not supported yet");
         }
 
         expenseSplitRepository.saveAll(expenseSplits);
+
+        List<SplitInfo> splitInfos = expenseSplits.stream()
+                .map(s -> SplitInfo.builder()
+                        .userName(s.getUser().getName())
+                        .amountOwed(s.getAmountOwed())
+                        .build())
+                .toList();
 
         return ExpenseResponse.builder()
                 .id(savedExpense.getId())
@@ -154,6 +202,7 @@ public class ExpenseService {
                 .paidBy(savedExpense.getPaidBy().getName())
                 .splitType(savedExpense.getSplitType().name())
                 .createdAt(savedExpense.getCreatedAt())
+                .splits(splitInfos)
                 .build();
     }
 

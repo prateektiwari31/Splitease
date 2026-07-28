@@ -16,7 +16,6 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
-    private final ExpenseService expenseService;
 
     @PostMapping
     public ResponseEntity<GroupResponse> createGroup(
@@ -52,14 +51,6 @@ public class GroupController {
     ) {
         return ResponseEntity.ok(groupService.removeMember(groupId, userId));
     }
-    @PostMapping("/{groupId}/expenses")
-    public ResponseEntity<ExpenseResponse> addExpense(
-            @PathVariable Long groupId,
-            @Valid @RequestBody CreateExpenseRequest request
-    ){
-        return ResponseEntity.ok(
-                expenseService.addExpense(groupId,request)
-        );
-    }
+
 
 }
