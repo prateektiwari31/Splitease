@@ -60,7 +60,7 @@ public class ExpenseService {
 
         Expense expense = Expense.builder()
                 .description(request.getDescription())
-                .totalAmount(request.getTotalAmount())
+                .amount(request.getTotalAmount())
                 .paidBy(paidBy)
                 .group(group)
                 .splitType(request.getSplitType())
@@ -198,7 +198,7 @@ public class ExpenseService {
         return ExpenseResponse.builder()
                 .id(savedExpense.getId())
                 .description(savedExpense.getDescription())
-                .totalAmount(savedExpense.getTotalAmount())
+                .totalAmount(savedExpense.getAmount())
                 .paidBy(savedExpense.getPaidBy().getName())
                 .splitType(savedExpense.getSplitType().name())
                 .createdAt(savedExpense.getCreatedAt())

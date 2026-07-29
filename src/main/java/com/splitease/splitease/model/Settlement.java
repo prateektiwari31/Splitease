@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Settlement {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,6 +26,14 @@ public class Settlement {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private ExpenseGroup group;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expense_id")
+    private Expense expense;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private SettlementStatus status = SettlementStatus.PENDING;
 
     private Double amount;
     private LocalDateTime settledAt;

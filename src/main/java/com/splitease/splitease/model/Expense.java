@@ -17,7 +17,7 @@ public class Expense {
     private Long id;
 
     private String description;
-    private Double totalAmount;
+    private Double amount;
 
     @ManyToOne
     @JoinColumn(name = "paid_by")

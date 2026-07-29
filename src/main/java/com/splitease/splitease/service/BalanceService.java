@@ -43,7 +43,7 @@ public class BalanceService {
         List<Expense> expenses = expenseRepository.findByGroupOrderByCreatedAtDesc(group);
         for (Expense expense : expenses) {
             Long payerId = expense.getPaidBy().getId();
-            netBalanceMap.merge(payerId, expense.getTotalAmount(), Double::sum);
+            netBalanceMap.merge(payerId, expense.getAmount(), Double::sum);
         }
 
         // Step 2: Jiska split hai, uska balance ghatao (-)
