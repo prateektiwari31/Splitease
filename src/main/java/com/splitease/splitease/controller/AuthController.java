@@ -1,6 +1,7 @@
 package com.splitease.splitease.controller;
 
 import com.splitease.splitease.dto.AuthResponse;
+import com.splitease.splitease.dto.CurrentUserResponse;
 import com.splitease.splitease.dto.LoginRequest;
 import com.splitease.splitease.dto.RegisterRequest;
 import com.splitease.splitease.service.AuthService;
@@ -24,5 +25,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+    @GetMapping("/me")
+    public ResponseEntity<CurrentUserResponse> getCurrentUser() {
+        return ResponseEntity.ok(authService.getCurrentUser());
     }
 }

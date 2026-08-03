@@ -1,6 +1,7 @@
 package com.splitease.splitease.service;
 
 import com.splitease.splitease.dto.AuthResponse;
+import com.splitease.splitease.dto.CurrentUserResponse;
 import com.splitease.splitease.dto.LoginRequest;
 import com.splitease.splitease.dto.RegisterRequest;
 import com.splitease.splitease.exception.ApiException;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,5 +60,24 @@ public class AuthService {
         String token = jwtService.generateToken(user);
 
         return new AuthResponse(token, user.getName(), user.getEmail());
+    }
+
+    public CurrentUserResponse getCurrentUser() {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                new ApiException("User not found", HttpStatus.NOT_FOUND));
+
+        return CurrentUserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 }
