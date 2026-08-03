@@ -2,6 +2,7 @@ package com.splitease.splitease.controller;
 
 import com.splitease.splitease.dto.CreateExpenseRequest;
 import com.splitease.splitease.dto.ExpenseResponse;
+import com.splitease.splitease.dto.SettleUpRequest;
 import com.splitease.splitease.service.ExpenseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +22,12 @@ public class ExpenseController {
             @Valid @RequestBody CreateExpenseRequest request) {
 
         return ResponseEntity.ok(expenseService.addExpense(groupId, request));
+    }
+    @PostMapping("/{groupId}/settle")
+    public ResponseEntity<ExpenseResponse> settleUp(
+            @PathVariable Long groupId,
+            @Valid @RequestBody SettleUpRequest request){
+
+        return ResponseEntity.ok(expenseService.settleUp(groupId, request));
     }
 }

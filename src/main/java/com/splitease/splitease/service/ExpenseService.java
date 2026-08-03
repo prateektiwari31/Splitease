@@ -2,6 +2,7 @@ package com.splitease.splitease.service;
 
 import com.splitease.splitease.dto.CreateExpenseRequest;
 import com.splitease.splitease.dto.ExpenseResponse;
+import com.splitease.splitease.dto.SettleUpRequest;
 import com.splitease.splitease.dto.SplitInfo;
 import com.splitease.splitease.model.*;
 import com.splitease.splitease.repository.ExpenseGroupRepository;
@@ -203,6 +204,52 @@ public class ExpenseService {
                 .splitType(savedExpense.getSplitType().name())
                 .createdAt(savedExpense.getCreatedAt())
                 .splits(splitInfos)
+                .build();
+    }
+
+    public ExpenseResponse settleUp(Long groupId, SettleUpRequest request) {
+
+        ExpenseGroup group = expenseGroupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        User payer = userRepository.findById(request.getPayerId())
+                .orElseThrow(() -> new RuntimeException("Payer not found"));
+
+        User receiver = userRepository.findById(request.getReceiverId())
+                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+
+        Expense expense = Expense.builder()
+                .description("Settlement")
+                .amount(request.getAmount())
+                .paidBy(payer)
+                .group(group)
+                .splitType(SplitType.EXACT)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        Expense savedExpense = expenseRepository.save(expense);
+
+        ExpenseSplit split = ExpenseSplit.builder()
+                .expense(savedExpense)
+                .user(receiver)
+                .amountOwed(request.getAmount())
+                .build();
+
+        expenseSplitRepository.save(split);
+
+        SplitInfo splitInfo = SplitInfo.builder()
+                .userName(receiver.getName())
+                .amountOwed(request.getAmount())
+                .build();
+
+        return ExpenseResponse.builder()
+                .id(savedExpense.getId())
+                .description(savedExpense.getDescription())
+                .totalAmount(savedExpense.getAmount())
+                .paidBy(savedExpense.getPaidBy().getName())
+                .splitType(savedExpense.getSplitType().name())
+                .createdAt(savedExpense.getCreatedAt())
+                .splits(List.of(splitInfo))
                 .build();
     }
 

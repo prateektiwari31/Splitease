@@ -4,13 +4,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CreateSettlementRequest {
+public class SettleUpRequest {
+
+    @NotNull
+    private Long payerId;
 
     @NotNull
     private Long receiverId;
-
-    @NotNull
-    private Long groupId;
 
     @NotNull
     private Double amount;
