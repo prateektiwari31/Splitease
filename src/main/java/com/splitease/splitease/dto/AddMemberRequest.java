@@ -8,6 +8,7 @@ import lombok.Data;
 public class AddMemberRequest {
 
     @NotBlank
-    @Email
+    @Email(message = "Invalid email")
+    @NotBlank(message = "Email is required")
     private String email;
 }

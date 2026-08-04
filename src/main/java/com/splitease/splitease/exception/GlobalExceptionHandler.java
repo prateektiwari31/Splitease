@@ -10,14 +10,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest request) {
-        return buildResponse(ex.getStatus(), ex.getMessage(), request);
+    public ResponseEntity<Map<String, Object>> handleApiException(ApiException ex) {
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", ex.getStatus().value());
+        response.put("error", ex.getStatus().getReasonPhrase());
+        response.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -44,4 +55,6 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(status).body(error);
     }
+
+
 }

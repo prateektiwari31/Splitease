@@ -14,6 +14,7 @@ public class CreateGroupRequest {
     private String name;
 
     @Size(max = 255)
+    @NotBlank(message = "Description is required")
     private String description;
 
 }

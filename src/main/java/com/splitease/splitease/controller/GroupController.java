@@ -52,5 +52,12 @@ public class GroupController {
         return ResponseEntity.ok(groupService.removeMember(groupId, userId));
     }
 
+    @GetMapping("/users/search")
+    public ResponseEntity<List<UserSearchResponse>> searchUsers(
+            @RequestParam String keyword){
 
+        return ResponseEntity.ok(
+                groupService.searchUsers(keyword)
+        );
+    }
 }

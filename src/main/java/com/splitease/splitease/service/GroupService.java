@@ -3,6 +3,7 @@ package com.splitease.splitease.service;
 import com.splitease.splitease.dto.AddMemberRequest;
 import com.splitease.splitease.dto.CreateGroupRequest;
 import com.splitease.splitease.dto.GroupResponse;
+import com.splitease.splitease.dto.UserSearchResponse;
 import com.splitease.splitease.exception.ApiException;
 import com.splitease.splitease.model.ExpenseGroup;
 import com.splitease.splitease.model.User;
@@ -139,5 +140,21 @@ public class GroupService {
                 .createdBy(group.getCreatedBy().getName())
                 .memberCount(group.getMembers().size())
                 .build();
+    }
+
+    public List<UserSearchResponse> searchUsers(String keyword) {
+
+        return userRepository
+                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                        keyword,
+                        keyword
+                )
+                .stream()
+                .map(user -> new UserSearchResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
+                ))
+                .toList();
     }
 }
