@@ -25,13 +25,6 @@ public class ExpenseController {
 
         return ResponseEntity.ok(expenseService.addExpense(groupId, request));
     }
-    @PostMapping("/{groupId}/settle")
-    public ResponseEntity<ExpenseResponse> settleUp(
-            @PathVariable Long groupId,
-            @Valid @RequestBody SettleUpRequest request){
-
-        return ResponseEntity.ok(expenseService.settleUp(groupId, request));
-    }
     @GetMapping("/{groupId}/expenses")
     public ResponseEntity<List<ExpenseResponse>> getGroupExpenses(
             @PathVariable Long groupId){
@@ -59,5 +52,12 @@ public class ExpenseController {
 
         return ResponseEntity.ok(
                 expenseService.updateExpense(expenseId, request));
+    }
+    @PostMapping("/{groupId}/settle")
+    public ResponseEntity<ExpenseResponse> settleUp(
+            @PathVariable Long groupId,
+            @Valid @RequestBody SettleUpRequest request){
+
+        return ResponseEntity.ok(expenseService.settleUp(groupId, request));
     }
 }
