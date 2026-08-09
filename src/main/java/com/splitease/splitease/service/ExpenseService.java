@@ -28,6 +28,7 @@ public class ExpenseService {
     private final ExpenseSplitRepository expenseSplitRepository;
     private final ExpenseGroupRepository expenseGroupRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     private User getCurrentUser() {
 
@@ -75,6 +76,8 @@ public class ExpenseService {
 
         expenseSplitRepository.saveAll(expenseSplits);
 
+        // Group members ko email notification (background thread pe, response block nahi hoga)
+        notificationService.notifyExpenseAdded(savedExpense, expenseSplits);
 
         List<SplitInfo> splitInfos = expenseSplits.stream()
                 .map(s -> SplitInfo.builder()
@@ -140,6 +143,8 @@ public class ExpenseService {
                 .build();
 
         expenseSplitRepository.save(split);
+
+        notificationService.notifySettlement(payer, receiver, request.getAmount(), group.getName());
 
         return ExpenseResponse.builder()
                 .id(savedExpense.getId())
