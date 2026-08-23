@@ -26,7 +26,7 @@ spring:
         transport:
           protocol: smtp
 server:
-  port: 8081
+  port: ${PORT:8081}
 jwt:
   secret: dGhpc2lzYXNlY3JldGtleWZvcmp3dHRva2VuZ2VuZXJhdGlvbnRoYXRpc2xvbmdlbm91Z2g=
   expiration: 86400000
