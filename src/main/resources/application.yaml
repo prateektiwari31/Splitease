@@ -2,9 +2,9 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://localhost:5433/splitease
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://ep-rough-queen-azpioxnk-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
